@@ -11,7 +11,7 @@ from hsplayer import log_path
 class Agent:
     world_state : WorldState
 
-    def __init__(self, log_path=None):
+    def __init__(self, model: str = "local", log_path=None):
         self.db = load(locale="zhCN")[0]
         self.log_path = get_latest_log_path() if log_path is None else log_path
         self.game = parse_log(self.log_path)
@@ -21,6 +21,7 @@ class Agent:
         self.current_node = self.action_tree.root
         self.response = None
         self.next_actions = {}
+        self.model = model
 
     def reinit(self):
         self.game = parse_log(self.log_path)
@@ -44,7 +45,7 @@ class Agent:
 
     def generate_response(self, prompt, stream_output = False):
         self.next_actions = {}
-        response_stream = generate(prompt, json_mode=True)
+        response_stream = generate(prompt, model=self.model, json_mode=True)
         full_response = ""            
         for chunk in response_stream:
             full_response += chunk

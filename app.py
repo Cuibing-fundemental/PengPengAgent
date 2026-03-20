@@ -1,6 +1,5 @@
 import streamlit as st
 import streamlit.components.v1 as components
-from hsplayer import agent
 from hsplayer.agent import Agent
 
 st.markdown(
@@ -36,7 +35,7 @@ if "editable_text" not in st.session_state:
     st.session_state.editable_text = "点击左侧按钮生成初始内容..."
     
 if 'agent' not in st.session_state:
-    st.session_state.agent = Agent()
+    st.session_state.agent = Agent(model="local")
     st.success("Agent 已初始化！")
 PPagent = st.session_state.agent 
 
@@ -46,6 +45,48 @@ st.set_page_config(
     page_icon="⚡",
     layout="wide"
 )
+
+st.sidebar.title("📂 导航")
+with st.sidebar:
+    st.subheader("⚙️ 模型配置")
+    
+    model_name = st.text_input(
+        "选择模型",
+        placeholder="local",
+        key="model"
+    )
+    
+    temperature = st.slider(
+        "Temperature (创造性)",
+        min_value=0.0,
+        max_value=1.0,
+        value=0.7,
+        step=0.1
+    )
+    
+    max_tokens = st.number_input(
+        "最大输出长度",
+        min_value=100,
+        max_value=8192,
+        value=2048
+    )
+    
+    use_gpu = st.checkbox("启用 GPU 加速", value=True)
+    
+    st.divider()
+    st.caption(f"当前模型: {model_name}")
+    if st.button("保存配置", type="primary", use_container_width=True):
+        st.success("配置已应用到会话状态！")
+        # 这里可以将配置存入 st.session_state 供主程序使用
+        st.session_state['current_model_config'] = {
+            "name": model_name,
+            "temp": temperature,
+            "max_tokens": max_tokens,
+            "gpu": use_gpu
+        }
+        PPagent.model = model_name
+        
+        st.success(f"已切换到模型: {model_name}！")
 
 # 3. --- 主内容区域 ---
 st.title("⚡ PPagent 控制台")

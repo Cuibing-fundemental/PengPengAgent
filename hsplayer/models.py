@@ -67,6 +67,7 @@ class Card:
         self.alias = card.card_id
         data = db.get(self.alias, None)
         self.name = getattr(data, 'name', '未知卡牌') if data else "未知卡牌"
+        self.name += f"(id:{self.id})"
         self.description = getattr(data, 'description', '未知描述') if data else "未知描述"
 
         type = CardType(getattr(data, 'type',CardType.INVALID))
@@ -81,9 +82,9 @@ class Card:
         if self.race is not None:
             self.race = CARD_RACE_NAMES.get(self.race, self.race)
 
-        pattern = r'<b>|</b>|\$'
-        self.description = re.sub(pattern, '', self.description)
-        self.description = re.sub(r"\n", ' ', self.description)
+        pattern = r'<b>|</b>'
+        self.description = re.sub(pattern, '*', self.description)
+        self.description = re.sub(r"\n|\$", ' ', self.description)
 
         
 
